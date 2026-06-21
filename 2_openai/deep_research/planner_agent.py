@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from agents import Agent
+from azure_client import get_AzureOpenAIChatCompletionsModel
 
 HOW_MANY_SEARCHES = 5
 
@@ -18,6 +19,6 @@ class WebSearchPlan(BaseModel):
 planner_agent = Agent(
     name="PlannerAgent",
     instructions=INSTRUCTIONS,
-    model="gpt-4o-mini",
+    model=get_AzureOpenAIChatCompletionsModel(),
     output_type=WebSearchPlan,
 )

@@ -1,9 +1,12 @@
-from agents import Runner, trace, gen_trace_id
+from agents import Runner, trace, gen_trace_id, set_trace_processors
 from search_agent import search_agent
 from planner_agent import planner_agent, WebSearchItem, WebSearchPlan
 from writer_agent import writer_agent, ReportData
 from email_agent import email_agent
 import asyncio
+# Langsmith tracing processor for OpenAI Agents SDK
+from langsmith.integrations.openai_agents_sdk import OpenAIAgentsTracingProcessor
+set_trace_processors([OpenAIAgentsTracingProcessor()])
 
 class ResearchManager:
 

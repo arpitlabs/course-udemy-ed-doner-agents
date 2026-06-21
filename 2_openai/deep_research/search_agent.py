@@ -1,4 +1,8 @@
 from agents import Agent, WebSearchTool, ModelSettings
+from sys import path
+from pathlib import Path
+path.insert(0, str(Path(__file__).parent.parent))
+from azure_client import get_AzureOpenAIChatCompletionsModel, azure_web_search
 
 INSTRUCTIONS = (
     "You are a research assistant. Given a search term, you search the web for that term and "
@@ -11,7 +15,7 @@ INSTRUCTIONS = (
 search_agent = Agent(
     name="Search agent",
     instructions=INSTRUCTIONS,
-    tools=[WebSearchTool(search_context_size="low")],
-    model="gpt-4o-mini",
+    tools=[azure_web_search],
+    model=get_AzureOpenAIChatCompletionsModel(),
     model_settings=ModelSettings(tool_choice="required"),
 )
