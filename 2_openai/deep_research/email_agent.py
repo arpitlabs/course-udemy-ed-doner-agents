@@ -1,34 +1,34 @@
-from agents import Agent, function_tool, ModelSettings
-from messenger import send_email, push
 import os
-from dotenv import load_dotenv
-load_dotenv(override=True)
+from typing import Dict
+from sys import path
+from pathlib import Path
 
-MODEL_NAME = os.getenv("DEFAULT_MODEL_NAME", "gpt-5.4-mini")
-USE_EMAIL = os.getenv("USE_EMAIL", "true").lower() == "true"
-
-settings = ModelSettings(tool_choice="required")
+import sendgrid
+#from sendgrid.helpers.mail import Email, Mail, Content, To
+from agents import Agent, function_tool
+path.insert(0, str(Path(__file__).parent.parent))
+from azure_client import get_AzureOpenAIChatCompletionsModel
 
 @function_tool
-def send_email_tool(subject: str, text_body: str, html_body: str) -> str:
-    """
-    Send out an email with the given subject and body
-    
-    Args:
-        subject: The subject of the email
-        text_body: The body of the email as plain text
-        html_body: The HTML body of the email
-    """
-    if USE_EMAIL:
-        send_email(subject, text_body, html_body)
-    else:
-        push(f"Subject: {subject}\n\n{text_body}")
-    return "Email sent successfully"
+def send_email(subject: str, html_body: str) -> Dict[str, str]:
+    """ Send out an email with the given subject and HTML body """
+    #sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+    from_email = "ed@edwarddonner.com" # Change this to your verified email
+    to_email = "ed.donner@gmail.com" # Change this to your email
+    content = html_body
+    mail = (from_email, to_email, subject, content)
+    print(mail)
+    #sg.client.mail.send.post(request_body=mail)
+    return "success"
 
 
-INSTRUCTIONS = """
-You are provided with a detailed report. Use your tool to send an email, converting the report into
-a clean, well presented HTML email with an appropriate subject line.
-"""
+INSTRUCTIONS = """You are able to send a nicely formatted HTML email based on a detailed report.
+You will be provided with a detailed report. You should use your tool to send one email, providing the 
+report converted into clean, well presented HTML with an appropriate subject line."""
 
-email_agent = Agent(name="Email Agent", instructions=INSTRUCTIONS, tools=[send_email_tool], model=MODEL_NAME, model_settings=settings)
+email_agent = Agent(
+    name="Email agent",
+    instructions=INSTRUCTIONS,
+    tools=[send_email],
+    model=get_AzureOpenAIChatCompletionsModel(),
+)
